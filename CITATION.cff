@@ -1,16 +1,38 @@
 cff-version: 1.2.0
-message: "If you use this software, please cite it as below."
+message: "If you use this software or the benchmark dataset, please cite the paper below."
 authors:
   - family-names: "Krechetova"
     given-names: "Varvara"
-title: "A Comparative Analysis of LLM Agents for Geospatial Tasks"
-version: 1.0.0
+  - family-names: "Kochedykov"
+    given-names: "Denis"
+title: "GeoBenchX: Benchmarking LLMs in Agent Solving Multistep Geospatial Tasks"
 date-released: 2025-03-22
 url: "https://github.com/Solirinai/GeoBenchX"
 preferred-citation:
-  type: article
+  type: conference-paper
   authors:
     - family-names: "Krechetova"
       given-names: "Varvara"
-  title: "A Comparative Analysis of LLM Agents for Geospatial Tasks"
+    - family-names: "Kochedykov"
+      given-names: "Denis"
+  title: "GeoBenchX: Benchmarking LLMs in Agent Solving Multistep Geospatial Tasks"
   year: 2025
+  collection-title: "Proceedings of the 1st ACM SIGSPATIAL International Workshop on Generative and Agentic AI for Multi-Modality Space-Time Intelligence (GeoGenAgent '25)"
+  publisher:
+    name: "Association for Computing Machinery"
+  location:
+    name: "Minneapolis, MN, USA"
+  start: 27
+  end: 35
+  isbn: "9798400722615"
+  doi: "10.1145/3764915.3770721"
+  url: "https://doi.org/10.1145/3764915.3770721"
+  keywords:
+    - "large language models (LLMs)"
+    - "geospatial analysis"
+    - "function calling"
+    - "LLM-as-judge evaluation"
+    - "GIS tools"
+    - "benchmarks"
+    - "spatial reasoning"
+    - "tool-based agents"
