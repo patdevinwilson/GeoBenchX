@@ -1279,6 +1279,12 @@ def select_features_by_spatial_relationship(
            # Reproject features to match reference CRS
            features_gdf = features_gdf.to_crs(reference_gdf.crs)            
 
+       # gpd.sjoin refuses inputs that still carry the index column of an earlier join,
+       # which happens whenever a selection is used as the input of another selection.
+       join_columns = ["index_left", "index_right"]
+       features_gdf = features_gdf.drop(columns=[c for c in join_columns if c in features_gdf.columns])
+       reference_gdf = reference_gdf.drop(columns=[c for c in join_columns if c in reference_gdf.columns])
+
        # Initialize an empty GeoDataFrame to store combined results
        selected_features = None
 
@@ -1291,7 +1297,13 @@ def select_features_by_spatial_relationship(
                selected_features = current_selection
            else:
                # Combine with previous results (OR logic)
-               selected_features = pd.concat([selected_features, current_selection]).drop_duplicates()
+               selected_features = pd.concat([selected_features, current_selection])
+
+       # sjoin returns one row per matching reference geometry. Keep each feature once,
+       # so a point inside two overlapping buffers is not counted twice.
+       if selected_features is not None:
+           selected_features = selected_features[~selected_features.index.duplicated(keep="first")]
+           selected_features = selected_features.drop(columns=["index_right"], errors="ignore")
 
        if selected_features is None or len(selected_features) == 0:
            return f"No features found matching any of the spatial predicates: {spatial_predicates}"
