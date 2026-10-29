@@ -2067,6 +2067,19 @@ def generate_contours_display(
         
         # Read the data into a numpy array
         data = temp_band.ReadAsArray()
+
+        # None means "use the raster's own range", as documented above.
+        if min_value is None or max_value is None:
+            valid = np.isfinite(data) & (data != nodataval)
+            source_nodata = raster_dataset.GetRasterBand(1).GetNoDataValue()
+            if source_nodata is not None:
+                valid &= data != source_nodata
+            if not valid.any():
+                return "Error: the raster has no valid values to contour"
+            if min_value is None:
+                min_value = float(data[valid].min())
+            if max_value is None:
+                max_value = float(data[valid].max())
         
         # Create mask for values outside the range and set them to nodata
         mask = (data < min_value) | (data > max_value) | (data == nodataval)
@@ -2179,24 +2192,22 @@ def generate_contours_display(
             # ax.set_aspect('equal')
             plt.grid(True, linestyle='--', alpha=0.6)
 
-        # Capture the figure as base64 before showing it
-        buf = io.BytesIO()
-        fig.savefig(buf, format='png', bbox_inches='tight', dpi=150)
-        buf.seek(0)
-        img_base64 = base64.b64encode(buf.read()).decode('utf-8')
-        buf.close()
+            # Capture the figure as base64 before showing it. Only here: with
+            # plot_result=False no figure exists.
+            buf = io.BytesIO()
+            fig.savefig(buf, format='png', bbox_inches='tight', dpi=150)
+            buf.seek(0)
+            img_base64 = base64.b64encode(buf.read()).decode('utf-8')
+            buf.close()
 
-        # Store the image in the state with metadata
-        state["image_store"].append({
-            "type": "map",
-            "description": f"Created contour lines with interval {contour_interval}.",
-            "base64": img_base64
-        })      
-            
-        if plot_result and "visualize" in state and state["visualize"]:
+            # Store the image in the state with metadata
+            state.setdefault("image_store", []).append({
+                "type": "map",
+                "description": f"Created contour lines with interval {contour_interval}.",
+                "base64": img_base64
+            })
+
             plt.show()
-        else:
-            plt.close()
 
         # Clean up temporary files if requested
         if cleanup_files:
